@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 057a370d3e134e0f9abd2af096042557
+timeCreated: 1724100742
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/LineProcessor/LineUVProcessor.cs
+  uploadId: 734703

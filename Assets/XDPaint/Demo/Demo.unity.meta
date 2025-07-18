@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: be4a50c43d63e4860a856bdf6670d858
+timeCreated: 1585937474
+licenseType: Store
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Demo.unity
+  uploadId: 734703

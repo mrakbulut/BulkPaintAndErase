@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ff21b0aef4672413b9e452547f042088
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Editor/ImportPackagePostprocessor.cs
+  uploadId: 734703

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8aa7d4d35f2fc4c898d9ed99ec05aca2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Tools/Raycast/Data/SubMeshTrianglesData.cs
+  uploadId: 734703

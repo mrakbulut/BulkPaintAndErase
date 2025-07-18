@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 340a390f9c7e345f4aadef81b14ec4b6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/States/IStatesController.cs
+  uploadId: 734703

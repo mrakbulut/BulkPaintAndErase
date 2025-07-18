@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 010ca74a76e649bfa0fad277d8ab3e81
+timeCreated: 1724101948
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/LineProcessor/Data/TextureLineData.cs
+  uploadId: 734703

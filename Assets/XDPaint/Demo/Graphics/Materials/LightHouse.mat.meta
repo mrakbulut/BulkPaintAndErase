@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4a363f388d2744db2b40a0c7886bfbaf
+timeCreated: 1555429640
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Graphics/Materials/LightHouse.mat
+  uploadId: 734703

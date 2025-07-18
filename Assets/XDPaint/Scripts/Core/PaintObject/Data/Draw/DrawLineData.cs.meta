@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 25787b5da363490386481a4be7359f5c
+timeCreated: 1682619708
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/Data/Draw/DrawLineData.cs
+  uploadId: 734703

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 6b1fdcc19a1df4b8fa972e7526c78c9d
+timeCreated: 1602239323
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Shaders/Blur.shader
+  uploadId: 734703

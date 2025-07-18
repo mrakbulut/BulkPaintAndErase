@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ca2febee3ab924dd3b65b27eebba683c
+timeCreated: 1435593076
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Graphics/Materials/Elemental.mat
+  uploadId: 734703

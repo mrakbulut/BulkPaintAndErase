@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 94b988dfc0eac4c29bcdf27f44797df5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/States/ChangeRecord/CollectionChangeRecord.cs
+  uploadId: 734703

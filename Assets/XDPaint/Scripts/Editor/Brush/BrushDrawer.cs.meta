@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 155e376f6bf9d469f9480b3384f23ee4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Editor/Brush/BrushDrawer.cs
+  uploadId: 734703

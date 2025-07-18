@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6c00e23d48889483a9aed4b40d5405d0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Resources/XDPaintStatesSettings.asset
+  uploadId: 734703

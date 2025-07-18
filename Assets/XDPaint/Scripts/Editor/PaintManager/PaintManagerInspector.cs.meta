@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 89aba6baf01854b21912484aa3eaccbb
+timeCreated: 1549376922
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Editor/PaintManager/PaintManagerInspector.cs
+  uploadId: 734703

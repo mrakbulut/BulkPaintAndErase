@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 623ead4fd1904e19813f7a81e65d8444
+timeCreated: 1724103735
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/LineProcessor/LineSmoothUVProcessor.cs
+  uploadId: 734703

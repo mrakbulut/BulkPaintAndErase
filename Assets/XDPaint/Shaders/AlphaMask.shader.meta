@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0e32ba1775f344e7880319750c287a62
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Shaders/AlphaMask.shader
+  uploadId: 734703

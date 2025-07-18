@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 65a757336c0e4ee99fd4039a044676d7
+timeCreated: 1724103052
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/LineProcessor/Data/WorldLineData.cs
+  uploadId: 734703

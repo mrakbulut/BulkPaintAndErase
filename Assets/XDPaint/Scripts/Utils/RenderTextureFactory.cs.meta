@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a342ea13736fa4dd2b5b180047ddfad4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Utils/RenderTextureFactory.cs
+  uploadId: 734703

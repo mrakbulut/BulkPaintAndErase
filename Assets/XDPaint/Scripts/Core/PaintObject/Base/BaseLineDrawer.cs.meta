@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 81c47c84ba7224daa9489fecafd7fc4c
+timeCreated: 1553717736
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/Base/BaseLineDrawer.cs
+  uploadId: 734703

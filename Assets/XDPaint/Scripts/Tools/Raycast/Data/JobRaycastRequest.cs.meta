@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 275b6928606f4f8e8151e9eea012741e
+timeCreated: 1695974936
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Tools/Raycast/Data/JobRaycastRequest.cs
+  uploadId: 734703

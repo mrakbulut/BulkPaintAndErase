@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 42246f9d5d4147f8bd76da9910cb9d33
+timeCreated: 1724104196
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/LineProcessor/Data/TextureSmoothLinesData.cs
+  uploadId: 734703

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2205cd241d20d4960ab3f102f16d8340
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Tools/Image/Eyedropper/EyedropperToolSettings.cs
+  uploadId: 734703

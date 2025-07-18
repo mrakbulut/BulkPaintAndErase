@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1dbf0df1092e24ba792af115c6e76e25
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Prefabs/LayerUI.prefab
+  uploadId: 734703

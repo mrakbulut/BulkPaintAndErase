@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9b512c3cb6f294b4ea8b3f69f7e0ea59
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Editor/Utils/AssetSaveProcessor.cs
+  uploadId: 734703

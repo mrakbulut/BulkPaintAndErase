@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: cb69471c7fa7a4247b090d462f81242c
+timeCreated: 1586163142
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Scripts/UI/UIDoubleClick.cs
+  uploadId: 734703

@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 781d14f46a2a4f22b89acf3dca6da2f2
+timeCreated: 1722886942
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/RaycastProcessor/PenRaycastProcessor.cs
+  uploadId: 734703

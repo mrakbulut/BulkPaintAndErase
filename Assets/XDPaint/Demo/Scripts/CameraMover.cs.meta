@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 3af5a4ee23fa44b6a9aee760859d8848
+timeCreated: 1556282785
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Scripts/CameraMover.cs
+  uploadId: 734703

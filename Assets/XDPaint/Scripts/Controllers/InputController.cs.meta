@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 34667ac5c73304dd6a4c6430532915b0
+timeCreated: 1554553421
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: -99
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Controllers/InputController.cs
+  uploadId: 734703

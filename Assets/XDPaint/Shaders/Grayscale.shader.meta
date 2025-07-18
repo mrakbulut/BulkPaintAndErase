@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: e1cb3741c3ed942fb848a22282a6a3b4
+timeCreated: 1602239323
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Shaders/Grayscale.shader
+  uploadId: 734703

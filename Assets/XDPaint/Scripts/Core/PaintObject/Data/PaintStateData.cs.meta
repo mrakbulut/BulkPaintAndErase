@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 953be2df0afa43b89f8b6050168314a3
+timeCreated: 1727347440
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/Data/PaintStateData.cs
+  uploadId: 734703

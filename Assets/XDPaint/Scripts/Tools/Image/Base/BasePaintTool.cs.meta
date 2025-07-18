@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c1aa6f3d1dad54fb89173c68ef71e316
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Tools/Image/Base/BasePaintTool.cs
+  uploadId: 734703

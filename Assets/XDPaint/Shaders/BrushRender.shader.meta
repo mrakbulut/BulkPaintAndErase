@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ab9a911b7a5994400b14606d502cfdd9
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Shaders/BrushRender.shader
+  uploadId: 734703

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 532450eed616e445baab1c8ba3767422
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Demo/Graphics/Prefabs/Elemental.prefab
+  uploadId: 734703

@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 212bd63ac0d7434cba8b9114c964c5f0
+timeCreated: 1649591696
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/Layers/ILayersController.cs
+  uploadId: 734703

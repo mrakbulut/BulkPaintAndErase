@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66404ba59ebe6fc46a149a980d9a9951, type: 3}
+  m_Name: Test_BuildingData_05
+  m_EditorClassIdentifier: 
+  BuildingName: F Unit
+  BuildingPrefab: {fileID: 2832369780738119404, guid: 4dba271535285c64faa1cb74a1d0b5fa, type: 3}
+  HologramPrefab: {fileID: 0}
+  UnitIcon: {fileID: 21300000, guid: 42187ab5930e847ce8737b5ad0197bf2, type: 3}
+  Width: 6
+  Height: 6
+  UnitPrefab: {fileID: 3274236811261713253, guid: 3dae41d23a4f02d4b88e13cadc86c7f0, type: 3}
+  SpawnInterval: 3
+  SpawnAnimationDuration: 1
+  SpawnOffset: {x: 0, y: 0, z: 0}

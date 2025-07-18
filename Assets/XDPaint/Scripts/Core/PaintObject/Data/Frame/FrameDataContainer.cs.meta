@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 44dafaba60a343c8bd89d477ff5703ec
+timeCreated: 1724189619
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/Data/Frame/FrameDataContainer.cs
+  uploadId: 734703

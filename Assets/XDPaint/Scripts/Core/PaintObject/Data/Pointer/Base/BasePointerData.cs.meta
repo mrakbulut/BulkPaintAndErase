@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: e1a52a7d70994942acb9fb07527cc967
+timeCreated: 1682619613
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212475
+  packageName: 2D/3D Paint
+  packageVersion: 3.2.1
+  assetPath: Assets/XDPaint/Scripts/Core/PaintObject/Data/Pointer/Base/BasePointerData.cs
+  uploadId: 734703

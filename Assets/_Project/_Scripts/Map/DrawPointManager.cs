@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using XDPaint;
 using XDPaint.Controllers;
@@ -12,15 +14,33 @@ public class DrawPointManager : MonoBehaviour
 {
     public static DrawPointManager Instance;
 
+    [SerializeField] private Renderer _objectForPaintRenderer;
+
+    [SerializeField] private int _textureWidth = 256;
+    [SerializeField] private int _textureHeight = 256;
+    
     [SerializeField] private int _frameInterval = 3;
     [SerializeField] private int _maxBatchSize = 10;
     [SerializeField] private bool _enableDebugLogs = false;
 
-    private readonly List<DrawPointRequest> _drawList = new List<DrawPointRequest>();
-    private readonly Dictionary<PaintManager, List<DrawPointRequest>> _batchedRequests = new Dictionary<PaintManager, List<DrawPointRequest>>();
+    // Painting UV lines
+    private readonly Dictionary<int, List<Vector2>> _paintingUVPositions = new Dictionary<int, List<Vector2>>();
+    private readonly Dictionary<int, List<float>> _paintingUVPressures = new Dictionary<int, List<float>>();
+    private readonly Dictionary<int, PaintManager> _paintingUVPaintManagers = new Dictionary<int, PaintManager>();
+    private readonly Dictionary<int, PainterConfig> _paintingUVPainterConfigs = new Dictionary<int, PainterConfig>();
+    
+    // Erasing UV lines
+    private readonly Dictionary<int, List<Vector2>> _erasingUVPositions = new Dictionary<int, List<Vector2>>();
+    private readonly Dictionary<int, List<float>> _erasingUVPressures = new Dictionary<int, List<float>>();
+    private readonly Dictionary<int, PaintManager> _erasingUVPaintManagers = new Dictionary<int, PaintManager>();
+    private readonly Dictionary<int, PainterConfig> _erasingUVPainterConfigs = new Dictionary<int, PainterConfig>();
     private int _frameCounter = 0;
     private bool _isProcessing = false;
 
+    private Bounds _bounds;
+
+    private bool _painting ;
+    
     private void Awake()
     {
         if (Instance == null)
@@ -34,137 +54,203 @@ public class DrawPointManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        var meshFilter = _objectForPaintRenderer.GetComponent<MeshFilter>();
+        _bounds = meshFilter.sharedMesh.bounds;
+    }
+
     private void Update()
     {
         _frameCounter++;
 
-        if (_frameCounter >= _frameInterval && !_isProcessing && _drawList.Count > 0)
+        if (_frameCounter >= _frameInterval && !_isProcessing)
         {
-            // Debug.Log("PROCESSING BATCHED DRAW REQUESTS : " + _drawList.Count);
-            ProcessBatchedDrawRequests();
+            
+            // Process UV lines that have accumulated positions
+            ProcessUVLines();
+            
             _frameCounter = 0;
         }
     }
 
     public void RequestDrawPoint(PaintManager paintManager, InputData inputData, PainterConfig painterConfig)
     {
-        // Perform raycast immediately and store the result
-        RaycastController.Instance.RequestRaycast(
-            paintManager,
-            inputData,
-            default(InputData),
-            container => OnRaycastCompleteForQueue(container, paintManager, inputData, painterConfig)
-            );
-    }
+        var fingerId = inputData.FingerId;
+        var worldPosition = inputData.Position;
 
-    private void OnRaycastCompleteForQueue(RaycastRequestContainer container, PaintManager paintManager, InputData inputData, PainterConfig painterConfig)
-    {
-        var raycastData = RaycastController.Instance.TryGetRaycast(container, inputData.FingerId, inputData.Ray.origin);
+        // Calculate UV position from world position using texture dimensions
+        var uvPosition = WorldToUV(worldPosition, paintManager);
 
-        if (raycastData != null)
+        if (uvPosition.HasValue)
         {
-            var request = new DrawPointRequest
+            // Determine if this is painting or erasing
+            bool isErasing = painterConfig.IsErasing;
+            
+            if (isErasing)
             {
-                PaintManager = paintManager,
-                InputData = inputData,
-                PainterConfig = painterConfig,
-                RaycastData = raycastData
-            };
+                // Initialize erasing UV line data for this finger ID if not exists
+                if (!_erasingUVPositions.ContainsKey(fingerId))
+                {
+                    _erasingUVPositions[fingerId] = new List<Vector2>();
+                    _erasingUVPressures[fingerId] = new List<float>();
+                    _erasingUVPaintManagers[fingerId] = paintManager;
+                    _erasingUVPainterConfigs[fingerId] = painterConfig;
+                }
 
-            _drawList.Add(request);
+                // Add UV position and pressure to the erasing line
+                _erasingUVPositions[fingerId].Add(uvPosition.Value);
+                _erasingUVPressures[fingerId].Add(inputData.Pressure);
+            }
+            else
+            {
+                // Initialize painting UV line data for this finger ID if not exists
+                if (!_paintingUVPositions.ContainsKey(fingerId))
+                {
+                    _paintingUVPositions[fingerId] = new List<Vector2>();
+                    _paintingUVPressures[fingerId] = new List<float>();
+                    _paintingUVPaintManagers[fingerId] = paintManager;
+                    _paintingUVPainterConfigs[fingerId] = painterConfig;
+                }
 
+                // Add UV position and pressure to the painting line
+                _paintingUVPositions[fingerId].Add(uvPosition.Value);
+                _paintingUVPressures[fingerId].Add(inputData.Pressure);
+            }
+            
             if (_enableDebugLogs)
             {
-                Debug.Log($"DrawPointManager: Added draw request with raycast data. List size: {_drawList.Count}");
+                string toolType = isErasing ? "Erasing" : "Painting";
+                Debug.Log($"DrawPointManager: Added {toolType} UV position {uvPosition.Value} for finger {fingerId}");
             }
-        }
-        else if (_enableDebugLogs)
-        {
-            Debug.LogWarning("DrawPointManager: Raycast failed, request not queued");
         }
     }
 
-    private void ProcessBatchedDrawRequests()
+    private void ProcessUVLines()
     {
-        if (_drawList.Count == 0 || _isProcessing)
+        _painting = !_painting;
+        
+        if (_painting)
         {
-            return;
+            ProcessPaintingLines();
         }
-
-        _isProcessing = true;
-        _batchedRequests.Clear();
-
-        // Determine the operation type from the first request
-        var firstRequest = _drawList[0];
-        bool isErasingBatch = firstRequest.PainterConfig.IsErasing;
-
-        // Group requests by PaintManager, but only for the same operation type (FIFO order)
-        int processedCount = 0;
-        var requestsToRemove = new List<DrawPointRequest>();
-
-        for (int i = 0; i < _drawList.Count && processedCount < _maxBatchSize; i++)
+        else 
         {
-            var request = _drawList[i];
-
-            // Only process requests with the same operation type (drawing or erasing)
-            if (request.PainterConfig.IsErasing != isErasingBatch)
+            ProcessErasingLines();
+        }
+    }
+    
+    private void ProcessPaintingLines()
+    {
+        if (_paintingUVPositions.Count == 0) return;
+        
+        // Set brush tool once at the beginning of the process phase
+        PaintManager firstPaintManager = null;
+        PainterConfig firstPainterConfig = null;
+        
+        // Get the first paint manager and config to set the tool
+        foreach (var kvp in _paintingUVPositions)
+        {
+            var fingerId = kvp.Key;
+            if (_paintingUVPaintManagers.ContainsKey(fingerId))
             {
-                continue; // Stop processing if operation type changes
+                firstPaintManager = _paintingUVPaintManagers[fingerId];
+                firstPainterConfig = _paintingUVPainterConfigs[fingerId];
+                break;
             }
-
-            if (!_batchedRequests.ContainsKey(request.PaintManager))
+        }
+        
+        if (firstPaintManager != null && firstPainterConfig != null)
+        {
+            // Set brush tool once for all painting operations in this frame
+            firstPaintManager.ToolsManager.SetTool(PaintTool.Brush);
+            firstPaintManager.Brush.Size = firstPainterConfig.BrushSize;
+            firstPaintManager.Brush.SetColor(firstPainterConfig.Color, true, false);
+            
+            if (_enableDebugLogs)
             {
-                _batchedRequests[request.PaintManager] = new List<DrawPointRequest>();
+                Debug.Log("DrawPointManager: Set BRUSH tool for painting lines");
             }
-
-            _batchedRequests[request.PaintManager].Add(request);
-            requestsToRemove.Add(request);
-            processedCount++;
         }
 
-        // Remove processed requests from the list (maintaining FIFO order)
-        foreach (var request in requestsToRemove)
+        // Process all painting lines
+        foreach (var kvp in _paintingUVPositions.ToList())
         {
-            _drawList.Remove(request);
+            var fingerId = kvp.Key;
+            var uvPositions = kvp.Value;
+            
+            // Only render lines with at least 2 positions
+            if (uvPositions.Count >= 2)
+            {
+                var paintManager = _paintingUVPaintManagers[fingerId];
+                var painterConfig = _paintingUVPainterConfigs[fingerId];
+                var pressures = _paintingUVPressures[fingerId];
+                
+                RenderUVLineWithoutToolSetup(paintManager, uvPositions.ToArray(), pressures.ToArray(), fingerId);
+                
+                // Clear the line data after rendering
+                ClearPaintingUVLineData(fingerId);
+            }
         }
-
-        if (_enableDebugLogs)
+    }
+    
+    private void ProcessErasingLines()
+    {
+        if (_erasingUVPositions.Count == 0) return;
+        
+        
+        // Set erase tool once at the beginning of the process phase
+        PaintManager firstPaintManager = null;
+        PainterConfig firstPainterConfig = null;
+        
+        // Get the first paint manager and config to set the tool
+        foreach (var kvp in _erasingUVPositions)
         {
-            string operationType = isErasingBatch ? "ERASING" : "DRAWING";
-            Debug.Log($"DrawPointManager: Processing {processedCount} {operationType} requests in {_batchedRequests.Count} batches. Remaining list size: {_drawList.Count}");
+            var fingerId = kvp.Key;
+            if (_erasingUVPaintManagers.ContainsKey(fingerId))
+            {
+                firstPaintManager = _erasingUVPaintManagers[fingerId];
+                firstPainterConfig = _erasingUVPainterConfigs[fingerId];
+                break;
+            }
         }
-
-        // Process each batch
-        foreach (var kvp in _batchedRequests)
+        
+        if (firstPaintManager != null && firstPainterConfig != null)
         {
-            var paintManager = kvp.Key;
-            var requests = kvp.Value;
-
-            ProcessBatchForPaintManager(paintManager, requests);
+            // Set erase tool once for all erasing operations in this frame
+            firstPaintManager.ToolsManager.SetTool(PaintTool.Erase);
+            firstPaintManager.Brush.Size = firstPainterConfig.BrushSize;
+            
+            if (_enableDebugLogs)
+            {
+                Debug.Log("DrawPointManager: Set ERASE tool for erasing lines");
+            }
         }
 
-        _isProcessing = false;
+        // Process all erasing lines
+        foreach (var kvp in _erasingUVPositions.ToList())
+        {
+            var fingerId = kvp.Key;
+            var uvPositions = kvp.Value;
+            
+            // Only render lines with at least 2 positions
+            if (uvPositions.Count >= 2)
+            {
+                var paintManager = _erasingUVPaintManagers[fingerId];
+                var painterConfig = _erasingUVPainterConfigs[fingerId];
+                var pressures = _erasingUVPressures[fingerId];
+                
+                RenderUVLineWithoutToolSetup(paintManager, uvPositions.ToArray(), pressures.ToArray(), fingerId);
+                
+                // Clear the line data after rendering
+                ClearErasingUVLineData(fingerId);
+            }
+        }
     }
 
-    private void ProcessBatchForPaintManager(PaintManager paintManager, List<DrawPointRequest> requests)
+    private void RenderUVLine(PaintManager paintManager, PainterConfig painterConfig, Vector2[] uvPositions, float[] pressures, int fingerId)
     {
-        if (requests.Count == 0) return;
-
-        // All requests in this batch have the same operation type (drawing or erasing)
-        // Now group by other config parameters (color, brush size, pressure) for drawing operations
-        var firstRequest = requests[0];
-
-        ProcessConfigGroup(paintManager, firstRequest.PainterConfig, requests);
-    }
-
-    private void ProcessConfigGroup(PaintManager paintManager, PainterConfig painterConfig, List<DrawPointRequest> requests)
-    {
-        // Store previous settings
-        /*var previousTool = paintManager.ToolsManager.CurrentTool;
-        var previousColor = paintManager.Brush.Color;
-        float previousSize = paintManager.Brush.Size;*/
-
-        // Apply current settings once for the entire batch
+        // Setup paint manager for line rendering
         var targetTool = painterConfig.IsErasing ? PaintTool.Erase : PaintTool.Brush;
         paintManager.ToolsManager.SetTool(targetTool);
         paintManager.Brush.Size = painterConfig.BrushSize;
@@ -174,136 +260,116 @@ public class DrawPointManager : MonoBehaviour
             paintManager.Brush.SetColor(painterConfig.Color, true, false);
         }
 
+        // Use the new DrawLineFromUV method in BasePaintObject
+        paintManager.PaintObject.DrawLineFromUV(uvPositions, pressures, fingerId);
+
         if (_enableDebugLogs)
         {
-            string operationType = painterConfig.IsErasing ? "ERASING" : "DRAWING";
-            Debug.Log($"DrawPointManager: {operationType} - Processing {requests.Count} requests with Tool={targetTool}, Color={painterConfig.Color}, BrushSize={painterConfig.BrushSize}");
+            Debug.Log($"DrawPointManager: Rendered UV line with {uvPositions.Length} positions for finger {fingerId}");
         }
-
-        // Process all requests using bulk DrawPoints operation
-        if (requests.Count == 1)
-        {
-            // Single point - use original DrawPoint for compatibility
-            ExecuteSingleDrawPoint(requests[0]);
-        }
-        else
-        {
-            // Multiple points - use new DrawPoints bulk method
-            ExecuteBulkDrawPoints(requests);
-        }
-
-        /*// Restore previous settings
-        if (previousTool != null)
-        {
-            paintManager.ToolsManager.SetTool(previousTool.Type);
-            paintManager.Brush.SetColor(previousColor, true, false);
-            paintManager.Brush.Size = previousSize;
-        }*/
     }
-
-
-    private void ExecuteSingleDrawPoint(DrawPointRequest request)
+    
+    private void RenderUVLineWithoutToolSetup(PaintManager paintManager, Vector2[] uvPositions, float[] pressures, int fingerId)
     {
-        // Raycast data is already available in the request
-        if (request.RaycastData != null)
+        // Render UV line without setting up the tool (tool is already set at the beginning of the process phase)
+        paintManager.PaintObject.DrawLineFromUV(uvPositions, pressures, fingerId);
+
+        if (_enableDebugLogs)
         {
-            request.PaintManager.PaintObject.DrawPoint(request.InputData, request.RaycastData);
-        }
-        else if (_enableDebugLogs)
-        {
-            Debug.LogWarning("DrawPointManager: RaycastData is null for draw request");
+            Debug.Log($"DrawPointManager: Rendered UV line with {uvPositions.Length} positions for finger {fingerId}");
         }
     }
 
-    private void ExecuteBulkDrawPoints(List<DrawPointRequest> requests)
+    public void RenderUVLineForFinger(int fingerId)
     {
-        if (requests.Count == 0) return;
-
-        // All requests in this list have the same PaintManager and config
-        var paintManager = requests[0].PaintManager;
-
-        // Prepare arrays for bulk operation
-        var inputDataArray = new InputData[requests.Count];
-        var raycastDataArray = new RaycastData[requests.Count];
-        int[] fingerIds = new int[requests.Count];
-
-        int validCount = 0;
-        for (int i = 0; i < requests.Count; i++)
+        // Check painting lines first
+        if (_paintingUVPositions.ContainsKey(fingerId) && _paintingUVPositions[fingerId].Count >= 2)
         {
-            var request = requests[i];
-            if (request.RaycastData != null)
-            {
-                inputDataArray[validCount] = request.InputData;
-                raycastDataArray[validCount] = request.RaycastData;
-                fingerIds[validCount] = request.InputData.FingerId;
-                validCount++;
-            }
-            else if (_enableDebugLogs)
-            {
-                Debug.LogWarning("DrawPointManager: RaycastData is null for bulk draw request");
-            }
+            var uvPositions = _paintingUVPositions[fingerId];
+            var paintManager = _paintingUVPaintManagers[fingerId];
+            var painterConfig = _paintingUVPainterConfigs[fingerId];
+            var pressures = _paintingUVPressures[fingerId];
+            
+            RenderUVLine(paintManager, painterConfig, uvPositions.ToArray(), pressures.ToArray(), fingerId);
+            ClearPaintingUVLineData(fingerId);
         }
-
-        if (validCount > 0)
+        
+        // Check erasing lines
+        if (_erasingUVPositions.ContainsKey(fingerId) && _erasingUVPositions[fingerId].Count >= 2)
         {
-            // Resize arrays to only include valid requests
-            if (validCount < requests.Count)
-            {
-                System.Array.Resize(ref inputDataArray, validCount);
-                System.Array.Resize(ref raycastDataArray, validCount);
-                System.Array.Resize(ref fingerIds, validCount);
-            }
+            var uvPositions = _erasingUVPositions[fingerId];
+            var paintManager = _erasingUVPaintManagers[fingerId];
+            var painterConfig = _erasingUVPainterConfigs[fingerId];
+            var pressures = _erasingUVPressures[fingerId];
+            
+            RenderUVLine(paintManager, painterConfig, uvPositions.ToArray(), pressures.ToArray(), fingerId);
+            ClearErasingUVLineData(fingerId);
+        }
+    }
 
-            // Execute bulk draw operation
-            paintManager.PaintObject.DrawPoints(inputDataArray, raycastDataArray, fingerIds);
+    private void ClearPaintingUVLineData(int fingerId)
+    {
+        if (_paintingUVPositions.ContainsKey(fingerId))
+        {
+            _paintingUVPositions.Remove(fingerId);
+            _paintingUVPressures.Remove(fingerId);
+            _paintingUVPaintManagers.Remove(fingerId);
+            _paintingUVPainterConfigs.Remove(fingerId);
+        }
+    }
+    
+    private void ClearErasingUVLineData(int fingerId)
+    {
+        if (_erasingUVPositions.ContainsKey(fingerId))
+        {
+            _erasingUVPositions.Remove(fingerId);
+            _erasingUVPressures.Remove(fingerId);
+            _erasingUVPaintManagers.Remove(fingerId);
+            _erasingUVPainterConfigs.Remove(fingerId);
+        }
+    }
+
+    public int GetUVLinePositionCount(int fingerId)
+    {
+        int paintingCount = _paintingUVPositions.ContainsKey(fingerId) ? _paintingUVPositions[fingerId].Count : 0;
+        int erasingCount = _erasingUVPositions.ContainsKey(fingerId) ? _erasingUVPositions[fingerId].Count : 0;
+        return paintingCount + erasingCount;
+    }
+
+    /// <summary>
+    /// Converts world position to UV coordinates using texture dimensions and object bounds
+    /// </summary>
+    private Vector2? WorldToUV(Vector3 worldPosition, PaintManager paintManager)
+    {
+        try
+        {
+            var localPosition = _objectForPaintRenderer.transform.InverseTransformPoint(worldPosition);
+            
+            var uvX = (localPosition.x - _bounds.min.x) / _bounds.size.x;
+            var uvY = (localPosition.z - _bounds.min.z) / _bounds.size.z; // Using Z for Y in UV space
+ 
+            // Clamp UV coordinates to valid range
+            uvX = Mathf.Clamp01(uvX);
+            uvY = Mathf.Clamp01(uvY);
+
+            var uvPosition = new Vector2(1f-uvX, 1f-uvY);
 
             if (_enableDebugLogs)
             {
-                Debug.Log($"DrawPointManager: Executed bulk draw operation with {validCount} points");
+                Debug.Log($"DrawPointManager: World pos {worldPosition} -> Local pos {localPosition} -> UV {uvPosition}");
+                Debug.Log($"DrawPointManager: Mesh bounds {_bounds}, Texture size {_textureWidth}x{_textureHeight}");
             }
+
+            return uvPosition;
         }
-    }
-
-    public void SetFrameInterval(int frameInterval)
-    {
-        _frameInterval = Mathf.Max(1, frameInterval);
-
-        if (_enableDebugLogs)
+        catch (System.Exception e)
         {
-            Debug.Log($"DrawPointManager: Frame interval set to {_frameInterval}");
+            if (_enableDebugLogs)
+                Debug.LogError($"DrawPointManager: Error calculating UV position: {e.Message}");
+            return null;
         }
     }
 
-    public void SetMaxBatchSize(int maxBatchSize)
-    {
-        _maxBatchSize = Mathf.Max(1, maxBatchSize);
-
-        if (_enableDebugLogs)
-        {
-            Debug.Log($"DrawPointManager: Max batch size set to {_maxBatchSize}");
-        }
-    }
-
-    public int GetListSize()
-    {
-        return _drawList.Count;
-    }
-
-    public void ClearList()
-    {
-        _drawList.Clear();
-        _isProcessing = false;
-
-        if (_enableDebugLogs)
-        {
-            Debug.Log("DrawPointManager: List cleared");
-        }
-    }
-
-    public void SetDebugMode(bool enabled)
-    {
-        _enableDebugLogs = enabled;
-    }
 }
 
 [System.Serializable]

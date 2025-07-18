@@ -665,13 +665,13 @@ MonoBehaviour:
   _upTeamPainterConfig:
     IsErasing: 0
     Color: {r: 0.34901962, g: 0, b: 1, a: 1}
-    Pressure: 1
-    BrushSize: 2
+    Pressure: 0.1
+    BrushSize: 0.1
   _downTeamPainterConfig:
     IsErasing: 1
     Color: {r: 0.34901962, g: 0, b: 1, a: 1}
-    Pressure: 1
-    BrushSize: 2
+    Pressure: 0.1
+    BrushSize: 0.1
 --- !u!114 &777725573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1908,6 +1908,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6a38906c5892794583993cb6d9d03ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _objectForPaintRenderer: {fileID: 932051573}
+  _textureWidth: 512
+  _textureHeight: 512
   _frameInterval: 1
   _maxBatchSize: 25
   _enableDebugLogs: 0

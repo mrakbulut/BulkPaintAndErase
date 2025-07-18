@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
     private void InitializeMatch()
     {
         // TODO: Haritanın yarısını boya.
-        _mapPainterManager.PaintTheHalf(MapPainterManager.MovementDirection.TopToBottom);
+        // _mapPainterManager.PaintTheHalf(MapPainterManager.MovementDirection.TopToBottom);
 
         var upTeamMinBound = new Vector3(_mapPainterManager.TopRightBound.x, _mapPainterManager.TopRightBound.y, _mapPainterManager.TopRightBound.z);
         var upTeamMaxBound = new Vector3(_mapPainterManager.BottomLeftBound.x, _mapPainterManager.BottomLeftBound.y, (_mapPainterManager.TopRightBound.z + _mapPainterManager.BottomLeftBound.z) / 2f);

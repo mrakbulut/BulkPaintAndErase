@@ -13,6 +13,7 @@ public class SimpleUnit : MonoBehaviour
     [SerializeField] private float _unitSpeed = 5f;
     [SerializeField] private float _paintDistance = 0.5f; // Distance between paint points
     [SerializeField] private float _heightOffset = 0.1f;
+    [SerializeField] private bool _checkDistanceForPaint = true;
 
     private PaintManager _paintManager;
     private PainterConfig _painterConfig;
@@ -62,7 +63,13 @@ public class SimpleUnit : MonoBehaviour
     private void CheckAndPaint()
     {
         var currentPosition = transform.position;
-
+        
+        if (!_checkDistanceForPaint)
+        {
+            PaintAtPosition(currentPosition);
+            return;
+        }
+        
         // If we don't have a previous position, set it and paint first point
         if (!_hasPreviousPaintPosition)
         {
@@ -87,7 +94,10 @@ public class SimpleUnit : MonoBehaviour
     {
         // Create ray pointing down from position
         var ray = new Ray(position + Vector3.up * _heightOffset, Vector3.down);
-        var inputData = new InputData(ray, position, _painterConfig.Pressure, InputSource.World, _startFingerId);
+        
+        // Send world position to DrawPointManager with UV InputSource
+        // DrawPointManager will collect UV positions and render them as lines
+        var inputData = new InputData(ray, position, _painterConfig.Pressure, InputSource.UV, _startFingerId);
 
         // Request draw point through DrawPointManager
         DrawPointManager.Instance.RequestDrawPoint(_paintManager, inputData, _painterConfig);
@@ -105,6 +115,12 @@ public class SimpleUnit : MonoBehaviour
     {
         if (FingerIndexManager.Instance != null)
         {
+            // Render the accumulated UV line when the unit is destroyed
+            if (DrawPointManager.Instance != null && DrawPointManager.Instance.GetUVLinePositionCount(_startFingerId) > 1)
+            {
+                DrawPointManager.Instance.RenderUVLineForFinger(_startFingerId);
+            }
+            
             ReleaseFingerIds();
         }
     }

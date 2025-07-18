@@ -135,6 +135,7 @@ namespace XDPaint.Core
     {
         Screen,
         World,
+        UV,
     }
     
     public enum RaycastSystemType

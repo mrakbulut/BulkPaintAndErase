@@ -51,6 +51,7 @@ MonoBehaviour:
   _unitSpeed: 2
   _paintDistance: 0.1
   _heightOffset: 0.1
+  _checkDistanceForPaint: 1
 --- !u!114 &5050874324779441277
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1294,76 +1294,29 @@ namespace XDPaint.Core.PaintObject.Base
             return raycasts;
         }
 
-        /// <summary>
-        /// Draws a line from UV coordinates using BaseLineDrawer's RenderLineUV method
-        /// </summary>
-        /// <param name="uvPositions">Array of UV coordinates (0-1 range)</param>
-        /// <param name="pressures">Array of pressure values for each position</param>
-        /// <param name="fingerId">Finger ID for the line</param>
-        /// <param name="onFinish">Callback when line rendering is complete</param>
-        public void DrawLineFromUV(Vector2[] uvPositions, float[] pressures, int fingerId = 0, Action onFinish = null)
+        public void DrawLineFromUV(Vector2[] texturePositions, float[] pressures)
         {
-            if (uvPositions == null || uvPositions.Length == 0)
+            if (texturePositions == null || texturePositions.Length == 0)
             {
                 Debug.LogWarning("BasePaintObject.DrawLineFromUV: No UV positions provided");
                 return;
             }
 
-            if (pressures == null || pressures.Length != uvPositions.Length)
+            if (pressures == null || pressures.Length != texturePositions.Length)
             {
                 Debug.LogWarning("BasePaintObject.DrawLineFromUV: Pressures array length doesn't match UV positions length");
                 return;
             }
 
-            if (fingerId < 0 || fingerId >= frameContainer.Data.Length)
+            if (PaintData.PaintSpace == PaintSpace.UV)
             {
-                Debug.LogWarning("BasePaintObject.DrawLineFromUV: Invalid finger ID");
-                return;
+                LineDrawer.RenderLineUV(texturePositions, RenderOffset, PaintData.Brush.RenderTexture, pressures, Tool.RandomizeLinesQuadsAngle);
+                IsPainted = true;
+                RenderToTextures();
             }
-
-            // Save current paint state
-            var state = SavePaintState(fingerId);
-            
-            try
+            else
             {
-                // Convert UV positions to texture positions
-                var texturePositions = new List<Vector2>();
-                for (int i = 0; i < uvPositions.Length; i++)
-                {
-                    var texturePos = ConvertUVToTexturePosition(uvPositions[i]);
-                    texturePositions.Add(texturePos);
-                }
-
-                // Use LineDrawer to render the line in UV space
-                if (PaintData.PaintSpace == PaintSpace.UV)
-                {
-                    LineDrawer.RenderLineUV(texturePositions, RenderOffset, PaintData.Brush.RenderTexture, pressures, Tool.RandomizeLinesQuadsAngle);
-                    IsPainted = true;
-                    RenderToTextures();
-                }
-                else
-                {
-                    Debug.LogWarning("BasePaintObject.DrawLineFromUV: Paint Space is not UV!");
-                }
-
-                /*// Invoke OnDrawLine event
-                if (OnDrawLine != null)
-                {
-                    var drawLineData = new DrawLineData
-                    {
-                        PaintSpace = PaintData.PaintSpace,
-                        TexturePositions = texturePositions.ToArray(),
-                        Pressures = pressures,
-                        FingerId = fingerId
-                    };
-                    OnDrawLine.Invoke(drawLineData);
-                }*/
-            }
-            finally
-            {
-                // Restore paint state
-                RestorePaintState(state, fingerId);
-                onFinish?.Invoke();
+                Debug.LogWarning("BasePaintObject.DrawLineFromUV: Paint Space is not UV!");
             }
         }
 

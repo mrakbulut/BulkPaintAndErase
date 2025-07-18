@@ -25,11 +25,6 @@ public class DrawLineManager : MonoBehaviour
         _instance = this;
     }
 
-    public void RequestDrawLine(DrawLineRequestData requestData)
-    {
-        _drawLineQueue.Enqueue(requestData);
-        ProcessQueue();
-    }
 
     private void CreateDrawLineRequest(DrawLineRequestData requestData)
     {

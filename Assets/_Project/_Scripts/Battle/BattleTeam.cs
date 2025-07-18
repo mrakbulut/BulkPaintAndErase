@@ -4,15 +4,13 @@ using XDPaint;
 
 public class BattleTeam
 {
-    private readonly PaintManager _paintManager;
     private readonly PainterConfig _painterConfig;
     private readonly Vector3 _direction;
     private readonly Vector3 _min;
     private readonly Vector3 _max;
 
-    public BattleTeam(PaintManager paintManager, PainterConfig painterConfig, Vector3 direction, Vector3 min, Vector3 max)
+    public BattleTeam( PainterConfig painterConfig, Vector3 direction, Vector3 min, Vector3 max)
     {
-        _paintManager = paintManager;
         _painterConfig = painterConfig;
         _direction = direction;
         _min = min;
@@ -26,7 +24,7 @@ public class BattleTeam
         var lookPoint = Quaternion.LookRotation(_direction);
         unit.transform.rotation = Quaternion.Euler(0f, lookPoint.eulerAngles.y, 0f);
 
-        unit.Setup(_paintManager, _painterConfig);
+        unit.Setup(_painterConfig);
     }
 
     public Vector3 GetRandomPositionBetweenBounds()

@@ -6,10 +6,6 @@ using UnityEngine;
 using XDPaint;
 using XDPaint.Core;
 using XDPaint.Tools.Image.Base;
-using XDPaint.Controllers;
-using XDPaint.Controllers.InputData;
-using XDPaint.Tools.Raycast.Data;
-using XDPaint.Utils;
 
 
 public class MapPainterManager : MonoBehaviour
@@ -41,10 +37,6 @@ public class MapPainterManager : MonoBehaviour
     private IPaintTool _previousTool;
     private Color _previousBrushColor;
     private float _previousBrushSize;
-
-    private Vector3 _minBound;
-    private Vector3 _maxBound;
-    private Vector3 _centerBound;
 
     public Vector3 BottomLeftBound => new Vector3(_bottomX, _heightOffset, _bottomZ);
     public Vector3 TopRightBound => new Vector3(_topX, _heightOffset, _topZ);
@@ -125,12 +117,6 @@ public class MapPainterManager : MonoBehaviour
         CacheBounds();
     }
 
-    private void Start()
-    {
-        PaintingLineManager.Instance.SetPaintManager(_paintManager);
-        ErasingLineManager.Instance.SetPaintManager(_paintManager);
-    }
-
     public void PaintTheMap(MovementDirection movementDirection)
     {
         _movementDirection = movementDirection;
@@ -182,10 +168,6 @@ public class MapPainterManager : MonoBehaviour
         _bottomX = bounds.min.x;
         _bottomZ = bounds.min.z;
 
-        _minBound = bounds.min;
-        _maxBound = bounds.max;
-        _centerBound = bounds.center;
-
         _topX = bounds.max.x;
         _topZ = bounds.max.z;
     }
@@ -203,7 +185,7 @@ public class MapPainterManager : MonoBehaviour
             var startPosition = new Vector3(xPos, _heightOffset, startZ);
             var endPosition = new Vector3(xPos, _heightOffset, endZ);
 
-            DrawLineBetweenPoints(startPosition, endPosition, 0, 1);
+            DrawLineBetweenPoints(startPosition, endPosition);
 
             // Store line for debug drawing
             _debugLines.Add((startPosition, endPosition));
@@ -246,15 +228,30 @@ public class MapPainterManager : MonoBehaviour
         }
     }
 
-    private void DrawLineBetweenPoints(Vector3 startPos, Vector3 endPos, int startFingerId, int endFingerId)
+    private void DrawLineBetweenPoints(Vector3 startPos, Vector3 endPosition)
     {
-        var startRay = new Ray(startPos, Vector3.down);
-        var endRay = new Ray(endPos, Vector3.down);
+        var interpolatedPositions = CalculateInterpolatedPositions(startPos, endPosition);
 
-        // Create request data (finger IDs will be assigned during processing)
-        var requestData = new DrawLineRequestData(startRay, startPos, endRay, endPos, _pressure, InputSource.World, startFingerId, endFingerId, _color, _brushSize);
+        foreach (var position in interpolatedPositions)
+        {
+            DrawPointManager.Instance.RequestDrawPoint(position, _brushSize, false);
+        }
+    }
 
-        PaintingLineManager.Instance.RequestDrawLine(requestData);
+    private List<Vector3> CalculateInterpolatedPositions(Vector3 startPos, Vector3 endPos)
+    {
+        var positions = new List<Vector3>();
+
+        int pointCount = 10;
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            float t = i / (float)(pointCount - 1);
+            var interpolatedPos = Vector3.Lerp(startPos, endPos, t);
+            positions.Add(interpolatedPos);
+        }
+
+        return positions;
     }
 
 

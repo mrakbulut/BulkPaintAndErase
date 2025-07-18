@@ -42,6 +42,11 @@ public class GameManager : MonoBehaviour
 
         Application.targetFrameRate = 60;
 
+        var paintingConfig = _upTeamPainterConfig.IsErasing ? _downTeamPainterConfig : _upTeamPainterConfig;
+        var erasingConfig = _upTeamPainterConfig.IsErasing ? _upTeamPainterConfig : _downTeamPainterConfig;
+
+        DrawPointManager.Instance.SetPaintManager(_paintManager, paintingConfig, erasingConfig);
+
         InitializeMatch();
     }
 
@@ -96,15 +101,15 @@ public class GameManager : MonoBehaviour
     private void InitializeMatch()
     {
         // TODO: Haritanın yarısını boya.
-        // _mapPainterManager.PaintTheHalf(MapPainterManager.MovementDirection.TopToBottom);
+        _mapPainterManager.PaintTheHalf(MapPainterManager.MovementDirection.TopToBottom);
 
         var upTeamMinBound = new Vector3(_mapPainterManager.TopRightBound.x, _mapPainterManager.TopRightBound.y, _mapPainterManager.TopRightBound.z);
         var upTeamMaxBound = new Vector3(_mapPainterManager.BottomLeftBound.x, _mapPainterManager.BottomLeftBound.y, (_mapPainterManager.TopRightBound.z + _mapPainterManager.BottomLeftBound.z) / 2f);
-        _upTeam = new BattleTeam(_paintManager, _upTeamPainterConfig, Vector3.back, upTeamMinBound, upTeamMaxBound);
+        _upTeam = new BattleTeam(_upTeamPainterConfig, Vector3.back, upTeamMinBound, upTeamMaxBound);
 
         var downTeamMinBound = new Vector3(_mapPainterManager.BottomLeftBound.x, _mapPainterManager.BottomLeftBound.y, _mapPainterManager.BottomLeftBound.z);
         var downTeamMaxBound = new Vector3(_mapPainterManager.TopRightBound.x, _mapPainterManager.TopRightBound.y, (_mapPainterManager.TopRightBound.z + _mapPainterManager.BottomLeftBound.z) / 2f);
-        _downTeam = new BattleTeam(_paintManager, _downTeamPainterConfig, Vector3.forward, downTeamMinBound, downTeamMaxBound);
+        _downTeam = new BattleTeam(_downTeamPainterConfig, Vector3.forward, downTeamMinBound, downTeamMaxBound);
 
         SetGameState(GameState.InGame);
     }

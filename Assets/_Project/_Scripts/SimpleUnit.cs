@@ -14,8 +14,7 @@ public class SimpleUnit : MonoBehaviour
     [SerializeField] private float _paintDistance = 0.5f; // Distance between paint points
     [SerializeField] private float _heightOffset = 0.1f;
     [SerializeField] private bool _checkDistanceForPaint = true;
-
-    private PaintManager _paintManager;
+    
     private PainterConfig _painterConfig;
     private bool _active;
     private float _timer;
@@ -23,18 +22,12 @@ public class SimpleUnit : MonoBehaviour
     private Vector3 _lastPaintPosition;
     private bool _hasPreviousPaintPosition;
 
-    private int _startFingerId;
-
-    public void Setup(PaintManager paintManager, PainterConfig painterConfig)
+    public void Setup( PainterConfig painterConfig)
     {
-        _paintManager = paintManager;
         _painterConfig = painterConfig;
         _active = true;
         _lastPaintPosition = transform.position;
         _hasPreviousPaintPosition = false;
-
-        // Request finger ID for this unit
-        _startFingerId = FingerIndexManager.Instance.GetNextFingerIndex();
     }
 
 
@@ -66,6 +59,9 @@ public class SimpleUnit : MonoBehaviour
         
         if (!_checkDistanceForPaint)
         {
+            if(_lastPaintPosition == currentPosition) return;
+            
+            _lastPaintPosition = currentPosition;
             PaintAtPosition(currentPosition);
             return;
         }
@@ -92,36 +88,7 @@ public class SimpleUnit : MonoBehaviour
 
     private void PaintAtPosition(Vector3 position)
     {
-        // Create ray pointing down from position
-        var ray = new Ray(position + Vector3.up * _heightOffset, Vector3.down);
-        
-        // Send world position to DrawPointManager with UV InputSource
-        // DrawPointManager will collect UV positions and render them as lines
-        var inputData = new InputData(ray, position, _painterConfig.Pressure, InputSource.UV, _startFingerId);
-
         // Request draw point through DrawPointManager
-        DrawPointManager.Instance.RequestDrawPoint(_paintManager, inputData, _painterConfig);
-    }
-
-    private void ReleaseFingerIds()
-    {
-        if (_startFingerId != -1)
-        {
-            FingerIndexManager.Instance.ReleaseFingerIndex(_startFingerId);
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (FingerIndexManager.Instance != null)
-        {
-            // Render the accumulated UV line when the unit is destroyed
-            if (DrawPointManager.Instance != null && DrawPointManager.Instance.GetUVLinePositionCount(_startFingerId) > 1)
-            {
-                DrawPointManager.Instance.RenderUVLineForFinger(_startFingerId);
-            }
-            
-            ReleaseFingerIds();
-        }
+        DrawPointManager.Instance.RequestDrawPoint(position, _painterConfig.Pressure, _painterConfig.IsErasing);
     }
 }

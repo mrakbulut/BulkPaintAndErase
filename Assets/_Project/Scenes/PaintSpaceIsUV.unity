@@ -665,13 +665,13 @@ MonoBehaviour:
   _upTeamPainterConfig:
     IsErasing: 0
     Color: {r: 0.34901962, g: 0, b: 1, a: 1}
-    Pressure: 0.1
-    BrushSize: 0.1
+    Pressure: 0.2
+    BrushSize: 0.2
   _downTeamPainterConfig:
     IsErasing: 1
     Color: {r: 0.34901962, g: 0, b: 1, a: 1}
-    Pressure: 0.1
-    BrushSize: 0.1
+    Pressure: 0.2
+    BrushSize: 0.2
 --- !u!114 &777725573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1829,8 +1829,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2141334717}
   - component: {fileID: 2141334718}
-  - component: {fileID: 2141334720}
-  - component: {fileID: 2141334719}
   - component: {fileID: 2141334721}
   m_Layer: 0
   m_Name: MapPainterManager
@@ -1869,33 +1867,9 @@ MonoBehaviour:
   _objectForPainting: {fileID: 932051570}
   _paintManager: {fileID: 1048212685}
   _color: {r: 0.34901962, g: 0, b: 1, a: 1}
-  _brushSize: 5
-  _eraseSize: 5
+  _brushSize: 0.25
+  _eraseSize: 0.25
   _heightOffset: 0.1
---- !u!114 &2141334719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2141334716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 389b809035e6c7e4bab59d28a89dcc11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2141334720
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2141334716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b8f02674511a1a4aa7c4cb1cdaa1157, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2141334721
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,7 +13,7 @@ public class DrawPointManager : MonoBehaviour
 
     [SerializeField] private int _frameInterval = 3;
     [SerializeField] private int _maxBatchSize = 10;
-    [SerializeField] private bool _enableDebugLogs = false;
+    [SerializeField] private bool _enableDebugLogs = true;
 
     // Painting UV lines
     private readonly List<Vector2> _paintingTexturePositions = new List<Vector2>();
@@ -25,12 +25,16 @@ public class DrawPointManager : MonoBehaviour
     private readonly List<Vector2> _erasingTexturePositions = new List<Vector2>();
     private readonly List<float> _erasingPressures = new List<float>();
     private PainterConfig _erasingUVPainterConfig;
+
+    // Pre-configured materials for dual mesh rendering
+    private Material _paintMaterial;
+    private Material _eraseMaterial;
     private int _frameCounter = 0;
     private bool _isProcessing = false;
 
     private Bounds _bounds;
-
     private bool _painting;
+
 
     private void Awake()
     {
@@ -57,8 +61,6 @@ public class DrawPointManager : MonoBehaviour
 
         if (_frameCounter >= _frameInterval && !_isProcessing)
         {
-
-            // Process UV lines that have accumulated positions
             ProcessUVLines();
 
             _frameCounter = 0;
@@ -74,6 +76,53 @@ public class DrawPointManager : MonoBehaviour
         var renderTexture = _paintManager.GetResultRenderTexture();
         _textureWidth = renderTexture.width;
         _textureHeight = renderTexture.height;
+
+        // Create separate material instances for paint and erase
+        CreateMaterialInstances();
+    }
+
+    private void CreateMaterialInstances()
+    {
+        // Store original tool to restore later
+        var originalTool = _paintManager.ToolsManager.CurrentTool;
+
+        // Setup paint material with full configuration
+        _paintManager.ToolsManager.SetTool(PaintTool.Brush);
+        _paintManager.Brush.Size = _paintingUVPainterConfig.BrushSize;
+        _paintManager.Brush.SetColor(_paintingUVPainterConfig.Color, true, false);
+        // Create a deep copy of the brush material with all its properties
+        _paintMaterial = new Material(_paintManager.Brush.Material);
+        _paintMaterial.name = "DrawPointManager_Paint_Material";
+
+        // Setup erase material with full configuration
+        _paintManager.ToolsManager.SetTool(PaintTool.Erase);
+        _paintManager.Brush.Size = _erasingUVPainterConfig.BrushSize;
+        // Create a deep copy of the erase material with all its properties
+        _eraseMaterial = new Material(_paintManager.Brush.Material);
+        _eraseMaterial.name = "DrawPointManager_Erase_Material";
+
+        // Restore original tool
+        if (originalTool != null)
+        {
+            _paintManager.ToolsManager.SetTool(originalTool.Type);
+        }
+
+        if (_enableDebugLogs)
+        {
+            Debug.Log($"DrawPointManager: Material instances created");
+            Debug.Log($"Paint Material: {_paintMaterial.name} - Shader: {_paintMaterial.shader.name}");
+            Debug.Log($"Erase Material: {_eraseMaterial.name} - Shader: {_eraseMaterial.shader.name}");
+
+            // Debug blend modes
+            if (_paintMaterial.HasProperty("_SrcBlend"))
+            {
+                Debug.Log($"Paint SrcBlend: {_paintMaterial.GetInt("_SrcBlend")}, DstBlend: {_paintMaterial.GetInt("_DstBlend")}");
+            }
+            if (_eraseMaterial.HasProperty("_SrcBlend"))
+            {
+                Debug.Log($"Erase SrcBlend: {_eraseMaterial.GetInt("_SrcBlend")}, DstBlend: {_eraseMaterial.GetInt("_DstBlend")}");
+            }
+        }
     }
     public void RequestDrawPoint(Vector3 worldPosition, float pressure, bool isErasing)
     {
@@ -99,46 +148,46 @@ public class DrawPointManager : MonoBehaviour
 
     private void ProcessUVLines()
     {
-        _painting = !_painting;
-
-        if (_painting)
-        {
-            ProcessPaintingLines();
-        }
-        else
-        {
-            ProcessErasingLines();
-        }
+        // Process both painting and erasing in single CommandBuffer to eliminate flickering
+        ProcessDualMeshLines();
     }
 
-    private void ProcessPaintingLines()
+    private void ProcessDualMeshLines()
     {
-        if (_paintingTexturePositions.Count == 0) return;
+        bool hasPaintData = _paintingTexturePositions.Count > 0;
+        bool hasEraseData = _erasingTexturePositions.Count > 0;
 
+        if (!hasPaintData && !hasEraseData) return;
+
+        // Set a tool temporarily for the render operation (required by XDPaint)
+        var originalTool = _paintManager.ToolsManager.CurrentTool;
         _paintManager.ToolsManager.SetTool(PaintTool.Brush);
-        _paintManager.Brush.Size = _paintingUVPainterConfig.BrushSize;
-        _paintManager.Brush.SetColor(_paintingUVPainterConfig.Color, true, false);
 
-        RenderUVLineWithoutToolSetup(_paintingTexturePositions.ToArray(), _paintingPressures.ToArray());
+        // Use optimized dual mesh rendering with pre-configured materials
+        _paintManager.PaintObject.DrawDualMeshFromUV(
+            hasPaintData ? _paintingTexturePositions.ToArray() : null,
+            hasPaintData ? _paintingPressures.ToArray() : null,
+            hasPaintData ? _paintMaterial : null,
+            Color.white, // Use white for proper texture blending - color comes from material
+            hasEraseData ? _erasingTexturePositions.ToArray() : null,
+            hasEraseData ? _erasingPressures.ToArray() : null,
+            hasEraseData ? _eraseMaterial : null
+            );
 
-        ClearPaintingUVLineData();
-    }
+        // Restore original tool if it was different
+        if (originalTool != null && originalTool.Type != PaintTool.Brush)
+        {
+            _paintManager.ToolsManager.SetTool(originalTool.Type);
+        }
 
-    private void ProcessErasingLines()
-    {
-        if (_erasingTexturePositions.Count == 0) return;
+        // Clear processed data
+        if (hasPaintData) ClearPaintingUVLineData();
+        if (hasEraseData) ClearErasingUVLineData();
 
-        _paintManager.ToolsManager.SetTool(PaintTool.Erase);
-        _paintManager.Brush.Size = _erasingUVPainterConfig.BrushSize;
-
-        RenderUVLineWithoutToolSetup(_erasingTexturePositions.ToArray(), _erasingPressures.ToArray());
-
-        ClearErasingUVLineData();
-    }
-
-    private void RenderUVLineWithoutToolSetup(Vector2[] uvPositions, float[] pressures)
-    {
-        _paintManager.PaintObject.DrawLineFromUV(uvPositions, pressures);
+        if (_enableDebugLogs)
+        {
+            Debug.Log($"DrawPointManager: Processed dual mesh - Paint:{(hasPaintData ? _paintingTexturePositions.Count : 0)} Erase:{(hasEraseData ? _erasingTexturePositions.Count : 0)}");
+        }
     }
 
     private void ClearPaintingUVLineData()
@@ -169,6 +218,22 @@ public class DrawPointManager : MonoBehaviour
     private Vector3 UvToTexturePosition(Vector2 uvPosition)
     {
         return new Vector2(uvPosition.x * _textureWidth, uvPosition.y * _textureHeight);
+    }
+
+    private void OnDestroy()
+    {
+        // Clean up material instances to prevent memory leaks
+        if (_paintMaterial != null)
+        {
+            DestroyImmediate(_paintMaterial);
+            _paintMaterial = null;
+        }
+
+        if (_eraseMaterial != null)
+        {
+            DestroyImmediate(_eraseMaterial);
+            _eraseMaterial = null;
+        }
     }
 
 }

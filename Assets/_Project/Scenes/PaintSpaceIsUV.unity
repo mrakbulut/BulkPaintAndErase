@@ -1885,7 +1885,7 @@ MonoBehaviour:
   _objectForPaintRenderer: {fileID: 932051573}
   _textureWidth: 512
   _textureHeight: 512
-  _frameInterval: 1
+  _frameInterval: 3
   _maxBatchSize: 25
   _enableDebugLogs: 0
 --- !u!1001 &2252633776026884624

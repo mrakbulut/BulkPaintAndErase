@@ -1320,6 +1320,39 @@ namespace XDPaint.Core.PaintObject.Base
             }
         }
 
+        public void DrawDualMeshFromUV(Vector2[] paintPositions, float[] paintPressures, Material paintMaterial, Color paintColor,
+            Vector2[] erasePositions, float[] erasePressures, Material eraseMaterial)
+        {
+            if (PaintData.PaintSpace != PaintSpace.UV)
+            {
+                Debug.LogWarning("BasePaintObject.DrawDualMeshFromUV: Paint Space is not UV!");
+                return;
+            }
+
+            Mesh paintMesh = null;
+            Mesh eraseMesh = null;
+
+            // Generate paint mesh if positions available
+            if (paintPositions != null && paintPositions.Length > 0 && paintPressures != null)
+            {
+                paintMesh = LineDrawer.GenerateMeshUV(paintPositions, RenderOffset, PaintData.Brush.RenderTexture, paintPressures, paintColor, Tool.RandomizeLinesQuadsAngle);
+            }
+
+            // Generate erase mesh if positions available  
+            if (erasePositions != null && erasePositions.Length > 0 && erasePressures != null)
+            {
+                eraseMesh = LineDrawer.GenerateMeshUV(erasePositions, RenderOffset, PaintData.Brush.RenderTexture, erasePressures, Color.white, Tool.RandomizeLinesQuadsAngle);
+            }
+
+            // Render both meshes in single CommandBuffer
+            if (paintMesh != null || eraseMesh != null)
+            {
+                RenderDualMeshUV(paintMesh, paintMaterial, eraseMesh, eraseMaterial);
+                IsPainted = true;
+                RenderToTextures();
+            }
+        }
+
         private bool AreRaycastDataValid(int fingerId, int frames)
         {
             if (frameContainer.Data[fingerId].Count < frames)

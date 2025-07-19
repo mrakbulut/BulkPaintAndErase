@@ -293,5 +293,60 @@ namespace XDPaint.Core.PaintObject.Base
             RenderToTarget(PaintData.PaintMode.RenderTarget, lineMesh, false);
             RenderToInput(lineMesh);
         }
+
+        public void RenderDualMeshUV(Mesh paintMesh, Material paintMaterial, Mesh eraseMesh, Material eraseMaterial)
+        {
+            if (paintMesh == null && eraseMesh == null) return;
+
+            GL.LoadOrtho();
+            
+            // Single CommandBuffer for both paint and erase operations
+            var builder = commandBuffer.Clear().SetRenderTarget(GetRenderTarget(PaintData.PaintMode.RenderTarget));
+            
+            // Add paint mesh first
+            if (paintMesh != null && paintMesh.vertexCount > 0)
+            {
+                builder.DrawMesh(paintMesh, paintMaterial);
+            }
+            
+            // Add erase mesh second  
+            if (eraseMesh != null && eraseMesh.vertexCount > 0)
+            {
+                builder.DrawMesh(eraseMesh, eraseMaterial);
+            }
+            
+            builder.Execute();
+            
+            // Render to input target with colorize pass (critical for proper edge handling)
+            if (Tool.RenderToInput)
+            {
+                var inputBuilder = commandBuffer.Clear().SetRenderTarget(GetRenderTarget(RenderTarget.Input));
+                
+                if (paintMesh != null && paintMesh.vertexCount > 0)
+                {
+                    inputBuilder.DrawMesh(paintMesh, paintMaterial);
+                }
+                
+                if (eraseMesh != null && eraseMesh.vertexCount > 0)
+                {
+                    inputBuilder.DrawMesh(eraseMesh, eraseMaterial);
+                }
+                
+                inputBuilder.Execute();
+                
+                // Apply colorize pass for proper edge processing and alpha blending
+                if (paintMesh != null && paintMesh.vertexCount > 0)
+                {
+                    commandBuffer.Clear().LoadOrtho().SetRenderTarget(GetRenderTarget(RenderTarget.Input))
+                        .DrawMesh(paintMesh, paintMaterial, paintMaterial.passCount - 1).Execute();
+                }
+                
+                if (eraseMesh != null && eraseMesh.vertexCount > 0)
+                {
+                    commandBuffer.Clear().LoadOrtho().SetRenderTarget(GetRenderTarget(RenderTarget.Input))
+                        .DrawMesh(eraseMesh, eraseMaterial, eraseMaterial.passCount - 1).Execute();
+                }
+            }
+        }
     }
 }
